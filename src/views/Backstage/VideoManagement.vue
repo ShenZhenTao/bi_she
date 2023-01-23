@@ -23,8 +23,8 @@
         <el-button slot="reference" type="danger">批量删除<i style="margin-left: 10px" class="el-icon-remove-outline"></i></el-button>
       </el-popconfirm>
 
-      <el-button type="primary">导入<i style="margin-left: 10px" class="el-icon-download"></i></el-button>
-      <el-button type="primary">导出<i style="margin-left: 10px" class="el-icon-upload2"></i></el-button>
+      <el-button type="primary" @click="upload">导入<i style="margin-left: 10px" class="el-icon-download"></i></el-button>
+      <el-button type="primary" @click="download">导出<i style="margin-left: 10px" class="el-icon-upload2"></i></el-button>
     </div>
 
 
@@ -33,15 +33,15 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="videoId" label="ID" width="80"></el-table-column>
       <el-table-column prop="title" label="番剧名" width="140"></el-table-column>
-      <el-table-column prop="popularity" label="热度" width="120"></el-table-column>
-      <el-table-column prop="director" label="导演"></el-table-column>
+      <el-table-column prop="popularity" label="热度"></el-table-column>
+      <el-table-column prop="director" label="导演" ></el-table-column>
       <el-table-column prop="actors" label="主演"></el-table-column>
       <el-table-column prop="area" label="地区"></el-table-column>
-      <el-table-column prop="plot" label="类型"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="plot" label="类型" ></el-table-column>
+      <el-table-column label="操作" width="300">
         <template slot-scope="scope">
           <el-button type="primary" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit-outline"></i></el-button>
-          <el-button type="info" @click="handleEdit2(scope.row)">添加<i class="el-icon-circle-plus-outline"></i></el-button>
+          <el-button type="info" @click="handleEdit2(scope.row)">添加剧集<i class="el-icon-circle-plus-outline"></i></el-button>
           <el-popconfirm
               confirm-button-text='确定'
               cancel-button-text='我再想想'
@@ -135,6 +135,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "VideoManagement",
   data(){
@@ -154,6 +156,12 @@ export default {
       addVisible:false,
       multipleSelection:[],
       total:0,
+      //查询条件
+      condition:{
+        title:"",
+        plot:"",
+        area:""
+      }
     }
   },
   created() {
@@ -163,8 +171,37 @@ export default {
   },
 
   methods:{
+    //导入数据
+    upload(){
+
+    },
+    download(){
+      // window.open("http://localhost:9091/backstage/test/downloadVideo")
+        axios({
+          method: "get",
+          url: "http://localhost:9091/backstage/test/downloadVideo",
+          responseType: "arraybuffer"
+        }).then(response => {
+          //通过header中获取返回的文件名称
+          let fileName = "导出文件"
+          let blob = new Blob([response.data], { type: "application/vnd.ms-excel" })
+          let downloadElement = document.createElement("a")
+          var href = window.URL.createObjectURL(blob)
+          downloadElement.href = href
+          //指定下载的文件的名称，切记进行decode
+          downloadElement.download = decodeURI(fileName)
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          //移除临时创建对象，释放资源
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+        });
+    },
+
+
+
     handleSizeChange(pageSize){
-      this.pageSize=pageSize
+      this.pageSize=pageSizes
       this.load()
     },
     handleCurrentChange(pageNum){

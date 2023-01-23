@@ -34,6 +34,7 @@ export default {
     this.jiazai()
     this.playVideo()
     this.cookie()
+    // this.getDuration()
   },
   data(){
     return{
@@ -46,9 +47,12 @@ export default {
   },
 
   methods:{
-
+    //当前视频播放位置
+    getDuration(){
+      // let myVid = document.getElementById("my-video");
+      // console.log(myVid.duration);
+    },
     cookie(){
-
       this.$cookies.config('30d')
     },
     playVideo() {

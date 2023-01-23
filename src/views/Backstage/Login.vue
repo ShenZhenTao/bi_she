@@ -42,7 +42,7 @@ export default {
   },
   methods:{
     login(){
-      this.request.post("/login",this.user).then(res=>{
+      this.request.post("/backstage/login",this.user).then(res=>{
         console.log(res)
         if (this.user.account==="" || this.user.password===""){
           this.$message.error("请输入账号和密码！")

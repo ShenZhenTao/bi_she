@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Manage from '../views/OmoFun/Manage.vue'
 import Router from 'vue-router'
 const routerPush = Router.prototype.push
 Router.prototype.push = function push(location) {
@@ -25,6 +24,18 @@ const routes = [
   {
     path: '/Backstage',
     name: 'Backstage',
+    component: () => import('../views/Backstage/BackstageView.vue'),
+    redirect: "video",
+    children:[
+      {path:'/video', name:'VideoManagement', component:()=>import('../views/Backstage/VideoManagement'),meta: {authRequired: true}},
+      {path: '/playManagement',name: 'PlayManagement.vue',component:()=>import('../views/Backstage/PlayManagement'),meta: {authRequired: true}},
+      {path: '/personal',name: 'Personal.vue',component:()=>import('../views/Backstage/Personal'),meta: {authRequired: true}},
+      {path: '/permission',name: 'Permission.vue',component:()=>import('../views/Backstage/Permission'),meta: {authRequired: true}}
+    ]
+  },
+  {
+    path: '/User',
+    name: 'User',
     component: () => import('../views/Backstage/BackstageView.vue'),
     redirect: "video",
     children:[

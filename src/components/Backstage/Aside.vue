@@ -43,7 +43,7 @@
         </template>
         <el-menu-item index="/permission">
           <i class="el-icon-coordinate"></i>
-          <span slot="title">权限管理</span>
+          <span slot="title">用户列表</span>
         </el-menu-item>
       </el-submenu>
 

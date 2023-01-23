@@ -2,7 +2,17 @@
 <div>
   <!--  这是个人信息界面-->
   <div class="div-left">
-      <img :src="userInfo.files.url" class="avatar" @click="">
+<!--      <img :src="userInfo.files.url" class="avatar" @click="">-->
+    <el-upload
+        class="avatar-uploader"
+        action="http://localhost:9091/file/upload"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload">
+      <img v-if=userInfo.files.url :src=userInfo.files.url class="avatar">
+      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+    </el-upload>
+
     <el-button @click="addVisible=true" size="medium" class="left-button" type="primary" >修改个人信息</el-button>
 
     <el-dialog title="用户信息" :visible.sync="addVisible" width="30%">
@@ -88,6 +98,22 @@ export default {
     this.UserInfo()
   },
   methods:{
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+    },
+
     UserInfo(){
       this.request.get("/backstage/userInfo",{
         params:{

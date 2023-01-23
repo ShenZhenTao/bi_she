@@ -22,18 +22,18 @@
       </el-popconfirm>
 
       <el-button type="primary">导入<i style="margin-left: 10px" class="el-icon-download"></i></el-button>
-      <el-button type="primary">导出<i style="margin-left: 10px" class="el-icon-upload2"></i></el-button>
+      <el-button type="primary" @click="download">导出<i style="margin-left: 10px" class="el-icon-upload2"></i></el-button>
     </div>
 
 
 
     <el-table :data="tableData"  @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="playId" label="ID" width="80"></el-table-column>
+      <el-table-column :disabled="true" prop="playId" label="ID" width="80"></el-table-column>
       <el-table-column prop="title" label="番剧名" width="200"></el-table-column>
       <el-table-column prop="part" label="剧集" width="120"></el-table-column>
-      <el-table-column prop="url" label="链接" width="1000"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="url" label="链接" ></el-table-column>
+      <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <el-button type="primary" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit-outline"></i></el-button>
           <el-popconfirm
@@ -66,14 +66,14 @@
 
     <el-dialog title="剧集信息" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-width="80px" size="small">
-        <el-form-item label="番剧ID">
-          <el-input v-model="form.videoId" autocomplete="off"></el-input>
+        <el-form-item  label="番剧ID">
+          <el-input  v-model="form.videoId" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="番剧名称">
           <el-input v-model="form.title" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="剧集ID">
-          <el-input v-model="form.playId" autocomplete="off"></el-input>
+        <el-form-item  label="剧集ID">
+          <el-input :disabled="true" v-model="form.playId" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="剧集">
           <el-input v-model="form.part" autocomplete="off"></el-input>
@@ -91,6 +91,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "PlayManagement",
   data(){
@@ -122,6 +124,28 @@ export default {
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum
       this.load()
+    },
+    download(){
+      // window.open("http://localhost:9091/backstage/test/downloadVideo")
+      axios({
+        method: "get",
+        url: "http://localhost:9091/backstage/test/downloadPlay",
+        responseType: "arraybuffer"
+      }).then(response => {
+        //通过header中获取返回的文件名称
+        let fileName = "导出文件"
+        let blob = new Blob([response.data], { type: "application/vnd.ms-excel" })
+        let downloadElement = document.createElement("a")
+        var href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        //指定下载的文件的名称，切记进行decode
+        downloadElement.download = decodeURI(fileName)
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        //移除临时创建对象，释放资源
+        document.body.removeChild(downloadElement)
+        window.URL.revokeObjectURL(href)
+      });
     },
     //  请求分页查询数据
     load() {
